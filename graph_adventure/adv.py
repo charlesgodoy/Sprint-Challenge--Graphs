@@ -30,30 +30,30 @@ graph = {}
 # FILL THIS IN
 traversalPath = []
 
-def DFS(parentRoom, currentRoom, entryDirection):
-    if(currentRoom.id in graph):
-        return
-
-    graph[currentRoom.id] = {}
+def DFS(parentRoom, currentRoom, entryDirection):   # parent room is room we came from
+    graph[currentRoom.id] = {}  # creating graph for current room id
     for exitDirection in currentRoom.getExits():
         graph[currentRoom.id][exitDirection] = "?"
 
     if(parentRoom is not None and entryDirection is not None):
-        graph[currentRoom.id][global_reverse_direction_map[entryDirection]] = parentRoom.id
+        graph[currentRoom.id][global_reverse_direction_map[entryDirection]] = parentRoom.id     # reverse the entry, so if we go go N from 1 to 2, then 2 back to 1 is S
         traversalPath.append(entryDirection)
 
-    for exitDirection in currentRoom.getExits():
+    for exitDirection in currentRoom.getExits():    # loop through all exits
         if(graph[currentRoom.id][exitDirection] == "?"):
-            player.travel(exitDirection)
+            player.travel(exitDirection)    # move to non visited room
             nextRoom = player.currentRoom
-            graph[currentRoom.id][exitDirection] = nextRoom.id
-            DFS(currentRoom, nextRoom, exitDirection)
-            if(len(graph) != len(roomGraph)):
-                traversalPath.append(global_reverse_direction_map[exitDirection])
-                player.travel(global_reverse_direction_map[exitDirection])
+            graph[currentRoom.id][exitDirection] = nextRoom.id  # add to the graph
+            if(nextRoom.id not in graph):   # calls DFS if room not visited
+                DFS(currentRoom, nextRoom, exitDirection)
+                if(len(graph) != len(roomGraph)):   # keep going until len of graph equals length of room
+                    traversalPath.append(global_reverse_direction_map[exitDirection])
+            player.travel(global_reverse_direction_map[exitDirection])
 
 player.currentRoom = world.startingRoom
 DFS(None, player.currentRoom, None)
+print("Path Traversal")
+print(traversalPath)
 print("Path: ", len(traversalPath))
 
 # TRAVERSAL TEST
